@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<link rel="icon" href="img/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>ADMIN // Evaaz Gaming</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="style.css">
 </head><body>
-<nav><a class="logo" href="index.html"><img src="img/logo.svg" alt="Evaaz Gaming"></a><div><a href="index.html?preview">Preview draft</a><a href="index.html">Site</a></div></nav>
+<nav><a class="logo" href="index.html"><img src="./logo.svg" alt="Evaaz Gaming"></a><div><a href="index.html?preview">Preview draft</a><a href="index.html">Site</a></div></nav>
 <div class="adm">
   <!-- Login -->
   <div id="login"><h2>Access</h2><label>Password</label><input type="password" id="pw" autofocus autocomplete="current-password"><br><br><button class="btn" id="go">Log in</button> <span id="err" style="color:#ff3860"></span></div>
@@ -20,7 +20,7 @@
       <div class="row"><div><label>Title</label><input id="f_title"></div><div><label>Tagline</label><input id="f_tagline"></div></div>
       <div class="row"><div><label>Status</label><select id="f_status"><option>Released</option><option>Coming Soon</option><option>In Development</option></select></div><div><label>Release date</label><input id="f_release" type="date"></div></div>
       <label>Tags (comma separated)</label><input id="f_tags">
-      <label>Cover image URL (e.g. img/cover.png)</label><input id="f_cover">
+      <label>Cover image URL (e.g. ./cover.png)</label><input id="f_cover">
       <label>Screenshots (one URL per line)</label><textarea id="f_shots" rows="3"></textarea>
       <label>Trailer (YouTube link or video URL)</label><input id="f_trailer">
       <label>Description</label><textarea id="f_desc" rows="5"></textarea>
@@ -29,7 +29,7 @@
     </div>
   </div>
 </div>
-<script src="js/config.js"></script>
+<script src="config.js"></script>
 <script>
 const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 let games = [], editing = -1;
@@ -37,7 +37,7 @@ let games = [], editing = -1;
 const sha = async s => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, '0')).join('');
 async function unlock() {
   $('#login').classList.add('hide'); $('#panel').classList.remove('hide');
-  games = JSON.parse(localStorage.getItem('na_draft') || 'null') || await (await fetch('data/games.json?' + Date.now())).json();
+  games = JSON.parse(localStorage.getItem('na_draft') || 'null') || await (await fetch('games.json?' + Date.now())).json();
   draw();
 }
 $('#go').onclick = async () => { if (!window.crypto?.subtle) { $('#err').textContent = 'Open this page via http://localhost (or GitHub Pages), not a plain http address.'; return; } if (await sha($('#pw').value) === ADMIN_HASH) { sessionStorage.na = 1; unlock(); } else $('#err').textContent = 'Wrong password'; };

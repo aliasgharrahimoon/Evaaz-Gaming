@@ -57,7 +57,7 @@ $('#socials').innerHTML = Object.entries(SITE.socials).map(([k, v]) => `<a class
 (async () => {
   const draft = location.search.includes('preview') && localStorage.getItem('na_draft');
   try {
-    GAMES = draft ? JSON.parse(draft) : await (await fetch('data/games.json?' + Date.now())).json();
+    GAMES = draft ? JSON.parse(draft) : await (await fetch('games.json?' + Date.now())).json();
     render();
   } catch (e) {
     $('#grid').innerHTML = '<div class="err">Could not load data/games.json. Open the site through a local server (python -m http.server 8000), not by double-clicking index.html.</div>';
