@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<title>ADMIN // Evaaz Gaming</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<nav><a class="logo" href="index.html"><img src="img/logo.svg" alt="Evaaz Gaming"></a><div><a href="index.html?preview">Preview draft</a><a href="index.html">Site</a></div></nav>
+<div class="adm">
+  <!-- Login -->
+  <div id="login"><h2>Access</h2><label>Password</label><input type="password" id="pw" autofocus autocomplete="current-password"><br><br><button class="btn" id="go">Log in</button> <span id="err" style="color:#ff3860"></span></div>
+  <!-- Panel -->
+  <div id="panel" class="hide">
+    <h2>Games</h2><div id="list"></div><br>
+    <button class="btn" id="new">+ New game</button>
+    <button class="btn m" id="export">⬇ Export games.json</button>
+    <label style="display:inline-block;margin-left:10px">Import <input type="file" id="imp" accept=".json" style="width:auto"></label>
+    <div id="form" class="hide"><h2 id="ft">Edit</h2>
+      <div class="row"><div><label>Title</label><input id="f_title"></div><div><label>Tagline</label><input id="f_tagline"></div></div>
+      <div class="row"><div><label>Status</label><select id="f_status"><option>Released</option><option>Coming Soon</option><option>In Development</option></select></div><div><label>Release date</label><input id="f_release" type="date"></div></div>
+      <label>Tags (comma separated)</label><input id="f_tags">
+      <label>Cover image URL (e.g. img/cover.png)</label><input id="f_cover">
+      <label>Screenshots (one URL per line)</label><textarea id="f_shots" rows="3"></textarea>
+      <label>Trailer (YouTube link or video URL)</label><input id="f_trailer">
+      <label>Description</label><textarea id="f_desc" rows="5"></textarea>
+      <div class="row"><div><label>Play link</label><input id="f_play"></div><div><label>Download link</label><input id="f_dl"></div></div><br>
+      <button class="btn" id="save">Save</button> <button class="btn m" id="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+<script src="js/config.js"></script>
+<script>
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let games = [], editing = -1;
+// Client-side login: compares SHA-256 of input with ADMIN_HASH (deterrent only, not real security)
+const sha = async s => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, '0')).join('');
+async function unlock() {
+  $('#login').classList.add('hide'); $('#panel').classList.remove('hide');
+  games = JSON.parse(localStorage.getItem('na_draft') || 'null') || await (await fetch('data/games.json?' + Date.now())).json();
+  draw();
+}
+$('#go').onclick = async () => { if (!window.crypto?.subtle) { $('#err').textContent = 'Open this page via http://localhost (or GitHub Pages), not a plain http address.'; return; } if (await sha($('#pw').value) === ADMIN_HASH) { sessionStorage.na = 1; unlock(); } else $('#err').textContent = 'Wrong password'; };
+$('#pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#go').click(); });
+if (sessionStorage.na) unlock();
+const persist = () => localStorage.setItem('na_draft', JSON.stringify(games, null, 2));
+function draw() {
+  $('#list').innerHTML = games.map((g, i) => `<div class="li"><span>${esc(g.title)} <small style="color:var(--mg)">[${esc(g.status)}]</small></span><span><button class="btn" onclick="edit(${i})">Edit</button><button class="btn r" onclick="del(${i})">Delete</button></span></div>`).join('') || '<p>Empty.</p>';
+}
+function edit(i) {
+  editing = i; const g = i < 0 ? { status: 'Released', tags: [], screenshots: [] } : games[i];
+  $('#ft').textContent = i < 0 ? 'New game' : 'Edit: ' + g.title;
+  $('#f_title').value = g.title || ''; $('#f_tagline').value = g.tagline || ''; $('#f_status').value = g.status; $('#f_release').value = g.release || '';
+  $('#f_tags').value = (g.tags || []).join(', '); $('#f_cover').value = g.cover || ''; $('#f_shots').value = (g.screenshots || []).join('\n');
+  $('#f_trailer').value = g.trailer || ''; $('#f_desc').value = g.description || ''; $('#f_play').value = g.play || ''; $('#f_dl').value = g.download || '';
+  $('#form').classList.remove('hide'); $('#form').scrollIntoView();
+}
+function del(i) { if (confirm('Delete ' + games[i].title + '?')) { games.splice(i, 1); persist(); draw(); } }
+$('#new').onclick = () => edit(-1);
+$('#cancel').onclick = () => $('#form').classList.add('hide');
+$('#save').onclick = () => {
+  const title = $('#f_title').value.trim(); if (!title) return alert('Title required');
+  const g = { id: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), title, tagline: $('#f_tagline').value, status: $('#f_status').value, release: $('#f_release').value,
+    tags: $('#f_tags').value.split(',').map(s => s.trim()).filter(Boolean), cover: $('#f_cover').value.trim(), screenshots: $('#f_shots').value.split('\n').map(s => s.trim()).filter(Boolean),
+    trailer: $('#f_trailer').value.trim(), description: $('#f_desc').value, play: $('#f_play').value.trim(), download: $('#f_dl').value.trim() };
+  editing < 0 ? games.push(g) : games[editing] = g; persist(); draw(); $('#form').classList.add('hide');
+};
+// Export: download games.json, then replace data/games.json in your repo and commit
+$('#export').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(games, null, 2)], { type: 'application/json' })); a.download = 'games.json'; a.click(); };
+$('#imp').onchange = async e => { games = JSON.parse(await e.target.files[0].text()); persist(); draw(); };
+</script></body></html>
