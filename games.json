@@ -1,0 +1,30 @@
+[
+  {
+    "id": "neon-runner",
+    "title": "Neon Runner",
+    "tagline": "Outrun the grid.",
+    "status": "Released",
+    "release": "2025-11-02",
+    "tags": ["Arcade", "Racing", "Synthwave"],
+    "cover": "",
+    "screenshots": [],
+    "trailer": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "description": "A high-speed cyberpunk racer through a collapsing megacity. Replace this sample with your own game in the admin panel.",
+    "play": "https://example.com/play",
+    "download": "https://example.com/download"
+  },
+  {
+    "id": "ghost-protocol",
+    "title": "Ghost Protocol",
+    "tagline": "Hack. Hide. Vanish.",
+    "status": "In Development",
+    "release": "2027-01-01",
+    "tags": ["Stealth", "Hacking"],
+    "cover": "",
+    "screenshots": [],
+    "trailer": "",
+    "description": "Infiltrate corporate towers with nothing but a deck and a bad attitude.",
+    "play": "",
+    "download": ""
+  }
+]
