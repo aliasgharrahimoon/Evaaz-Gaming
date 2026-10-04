@@ -27,4 +27,18 @@
     "play": "",
     "download": ""
   }
+  {
+    "id": "TOKYO DRIFT",
+    "title": "TOKYO DRIFT",
+    "tagline": "Outrun the grid.",
+    "status": "Released",
+    "release": "2025-11-02",
+    "tags": ["Arcade", "Racing", "Synthwave"],
+    "cover": "logo.svg",
+    "screenshots": [logo.svg],
+    "trailer": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "description": "A high-speed cyberpunk racer through a collapsing megacity. Replace this sample with your own game in the admin panel.",
+    "play": "https://example.com/play",
+    "download": "https://example.com/download"
+  },
 ]
